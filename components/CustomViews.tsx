@@ -1,5 +1,10 @@
 import {View, StyleSheet, type ViewProps} from 'react-native'
 
+/**
+ * Custom View component used to style consistently used <View> tags throughout the application.
+ */
+
+
 export type CustomViewStyles = ViewProps & {
     type?: 'title' | 'error' | 'default' | 'content' | 'buttons' | 'inputs' | 'footer' | 'scrollContainer'
 }

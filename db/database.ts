@@ -1,5 +1,10 @@
 import * as SQLite from "expo-sqlite"
 
+/**
+ * database file to create SQLite database
+ */
+
+
 let db: SQLite.SQLiteDatabase | null = null;
 
 export async function getDb(): Promise<SQLite.SQLiteDatabase> {

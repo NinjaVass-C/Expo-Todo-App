@@ -7,6 +7,16 @@ import {useState} from "react";
 import {useTodos} from "@/hooks/useTodos";
 import {Checkbox} from "expo-checkbox";
 
+/**
+ * Page used for updating todos, when clicking on the update
+ * button for a todo, sends the id, description, due date, and completed status,
+ * allowing the user to modify all aspects of the todo. The user can then press 'update todo'
+ * to update the record in the db, then return back to home. Return to home button is also present to cancel.
+ *
+ *
+ */
+
+
 export default function UpdateTodoPage() {
     const {id, initialDescription, initialDueDate, initialCompleted} = useLocalSearchParams<{
         id: string;

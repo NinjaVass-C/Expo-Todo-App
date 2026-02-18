@@ -7,10 +7,20 @@ import {router} from "expo-router";
 import {useTodos} from '@/hooks/useTodos'
 import {TodoTask} from "@/components/TodoTask";
 
+/**
+ * Index page for user to perform crud operations
+ * on their todos. All todos already created are listed in a
+ * scroll view, with the user being able to toggle by not completed/all tasks.
+ * The user can also clear all todo tasks at once with the 'clear all' button.
+ */
+
+
 
 export default function Index() {
     const [includeCompleted, setIncludeCompleted] = useState(false);
-    const {todos, error, loading, fetchTodos, updateTodo, deleteAllTodos} = useTodos();
+    const {todos, fetchTodos, updateTodo, deleteAllTodos} = useTodos();
+
+    // useEffect for updating todos list when filtering by not completed/all
     useEffect(() => {
         fetchTodos(includeCompleted);
     }, [fetchTodos, includeCompleted]);
@@ -23,6 +33,9 @@ export default function Index() {
                 </CustomText>
             </CustomViews>
             <CustomViews type={'scrollContainer'}>
+                {/* Flatlist that is used to store todos. Using the todos fetched in the useEffect,
+                 Creates a TodoTask Component for each todo, allowing the user to easily delete, update, and mark
+                 an individual task as complete*/}
                 <FlatList
                     contentContainerStyle={Styles.scrollView}
                     data={todos}
@@ -53,6 +66,9 @@ export default function Index() {
                                   onToggleComplete={() => {
                                       item.is_completed = !item.is_completed;
                                       updateTodo(item.id, item.description, item.due_date, item.is_completed);
+                                      // when marking a task as complete, fetch the todos again to update,
+                                      // I did this instead of updating the checkbox state directly since I wanted
+                                      // to keep the db as the source of truth.
                                       fetchTodos(includeCompleted);
                                   }}
                         />

@@ -4,12 +4,27 @@ import {router, useLocalSearchParams} from "expo-router";
 import {CustomText} from "@/components/CustomText";
 import {useTodos} from "@/hooks/useTodos";
 
+
+/**
+ * Page used for confirming a deletion
+ * of a todo, displays the description,
+ * allowing user to validate their option.
+ * The user can either delete the todo, or
+ * return back to the home page
+ */
+
+
+
+
 export default function DeleteTodoPage() {
+    // get params sent by the index router call
     const { id, description } = useLocalSearchParams<{
         id: string;
         description: string;
     }>();
     const {deleteTodo} = useTodos();
+
+    // Helper function to delete todo and go back to home in one go
     function validateDeletion() {
         deleteTodo(Number(id));
         router.push('/');

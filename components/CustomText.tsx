@@ -1,5 +1,13 @@
 import {Text, StyleSheet, type TextProps} from 'react-native'
 
+/**
+ * Custom text component used to style consistently used <Text> tags
+ * throughout the application
+ *
+ */
+
+
+
 export type CustomTextStyles = TextProps & {
     type?: 'title' | 'subtitle' | 'error' | 'default' | 'buttonText'
 }

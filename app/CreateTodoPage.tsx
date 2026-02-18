@@ -6,6 +6,15 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import {router} from "expo-router";
 import {useTodos} from '@/hooks/useTodos'
 
+/**
+ * Page used for creating todos, allows user to enter
+ * a description and due date, then a 'create todo' button
+ * to submit the todo. Also has a button to go back home
+ *
+ *
+ */
+
+
 export default function CreateTodoPage() {
     const [description, setDescription] = useState<string>('');
     const [dueDate, setDueDate] = useState<Date>(new Date());
@@ -61,6 +70,8 @@ export default function CreateTodoPage() {
                             value={dueDate}
                             mode={'date'}
                             onChange={(value) => {
+                                // In order to work with the useState, need to get the
+                                // timestamp of the DateTimePicker
                                 setDueDate(new Date(value.nativeEvent.timestamp));
                                 setShowDateSelector(false)
                             }}

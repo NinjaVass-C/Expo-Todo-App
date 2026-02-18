@@ -2,6 +2,18 @@ import {View, StyleSheet, Text, Pressable} from "react-native";
 import {Checkbox} from 'expo-checkbox'
 import {CustomText} from "@/components/CustomText";
 
+/**
+ * TodoTask components used to render individual todo tasks,
+ * receives information about the todo item, and also contains
+ * inputs that trigger functions to perform crud operations on
+ * each individual task. This is used in index to delete, update, and
+ * mark a task as completed.
+ *
+ */
+
+
+
+// Custom type used for the component.
 type TodoTaskProps = {
     description: string;
     isCompleted: boolean;
@@ -13,14 +25,15 @@ type TodoTaskProps = {
 };
 
 export function TodoTask({description, isCompleted, dueDate, createdDate, onToggleComplete, onDelete, onEdit}: TodoTaskProps) {
-    const convertedCreatedDate = new Date(createdDate);
-    const convertedDueDate = new Date(dueDate);
+    // convert the date timestamp to a date, allowing it to be converted to a readable format
+    const convertedCreatedDate = new Date(createdDate).toDateString();
+    const convertedDueDate = new Date(dueDate).toDateString();
     return (
         <View style={Styles.mainContainer}>
             <View style={Styles.textContainer}>
                 <CustomText type={'subtitle'}>{description}</CustomText>
-                <Text>Created At: {convertedCreatedDate.toDateString()}</Text>
-                <Text>Due Date: {convertedDueDate.toDateString()}</Text>
+                <Text>Created At: {convertedCreatedDate}</Text>
+                <Text>Due Date: {convertedDueDate}</Text>
             </View>
             <View style={Styles.buttonContainer}>
                 <Pressable

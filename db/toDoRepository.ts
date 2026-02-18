@@ -1,5 +1,13 @@
 import {getDb} from './database';
 
+/**
+ * Todo repository used for performing Crud actions on the database.
+ * Has the ability to create todos, delete a specific / all todos, update todos,
+ * and fetch all todos.
+ */
+
+// As mentioned in the documentation, two types were used to prevent errors with boolean
+// values and type casting for rendering completed checkboxes.
 export type Todo = {
     id: number;
     description: string;
@@ -69,7 +77,7 @@ export async function deleteTodos() {
     DELETE FROM todos
     `);
 }
-
+// Debug function for deleting db
 export async function dropTables() {
     const db = await getDb();
     return await db.getAllAsync(`
