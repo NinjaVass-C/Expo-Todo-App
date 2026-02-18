@@ -1,9 +1,134 @@
-import {Text} from 'react-native'
+import {Pressable, StyleSheet, TextInput} from 'react-native'
+import {CustomViews} from "@/components/CustomViews";
+import {CustomText} from "@/components/CustomText";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import {router, useLocalSearchParams} from "expo-router";
+import {useState} from "react";
+import {useTodos} from "@/hooks/useTodos";
+import {Checkbox} from "expo-checkbox";
 
 export default function UpdateTodoPage() {
+    const {id, initialDescription, initialDueDate, initialCompleted} = useLocalSearchParams<{
+        id: string;
+        initialDescription: string;
+        initialDueDate: string;
+        initialCompleted: string;
+    }>();
+
+    const [description, setDescription] = useState<string>(initialDescription);
+    const [dueDate, setDueDate] = useState<Date>(new Date(Number(initialDueDate)));
+    const [completed, setCompleted] = useState<boolean>(initialCompleted === 'true');
+    const [showDateSelector, setShowDateSelector] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+    const {updateTodo} = useTodos();
+
+    function validateTodo() {
+        setError('');
+        if (description !== '') {
+            setDescription(description);
+            console.log(dueDate);
+            updateTodo(Number(id), description, Number(dueDate), completed);
+            router.push('/')
+        } else {
+            setError('Please enter a description for the todo.')
+        }
+    }
+
     return (
-        <Text>
-            test update page
-        </Text>
+        <CustomViews type={'default'}>
+            <CustomViews type={'title'}>
+                <CustomText type={'title'}>
+                    Editing Todo
+                </CustomText>
+            </CustomViews>
+            <CustomViews type={'content'}>
+                <CustomViews type={'inputs'}>
+                    <CustomText type={'subtitle'}>
+                        Please enter a Description
+                    </CustomText>
+                    <TextInput
+                        style={Styles.textInput}
+                        onChangeText={input => setDescription(input)}
+                        placeholder={description}
+                    />
+                </CustomViews>
+                <CustomViews type={'inputs'}>
+                    <Pressable
+                        style={Styles.button}
+                        onPress={() => {
+                            setShowDateSelector(true)
+                        }}
+                    >
+                        <CustomText type={'buttonText'}>Click to enter due date</CustomText>
+                    </Pressable>
+                    {showDateSelector && (<DateTimePicker
+                            value={dueDate}
+                            mode={'date'}
+                            onChange={(value) => {
+                                setDueDate(new Date(value.nativeEvent.timestamp));
+                                setShowDateSelector(false)
+                            }}
+                        />
+                    )
+                    }
+                    <CustomText type={'subtitle'}>
+                        The current date selected is {dueDate.toDateString()}
+                    </CustomText>
+                    <CustomText type={'subtitle'}>
+                        Toggle Task Completion Status
+                    </CustomText>
+                    <Checkbox
+                        value={completed}
+                        onValueChange={(completed) => {
+                            console.log(completed);
+                            setCompleted(completed)
+                        }}
+                    />
+                </CustomViews>
+                <CustomViews type={'error'}>
+                    <CustomText type={'error'}>
+                        {error}
+                    </CustomText>
+                </CustomViews>
+            </CustomViews>
+
+            <CustomViews type={'footer'}>
+                <CustomViews type={'buttons'}>
+                    <Pressable
+                        style={Styles.button}
+                        onPress={() => validateTodo()}
+                    >
+                        <CustomText type={'buttonText'}>Update Todo</CustomText>
+                    </Pressable>
+                    <Pressable
+                        style={Styles.button}
+                        onPress={() => {
+                            router.push('/')
+                        }}
+                    >
+                        <CustomText type={'buttonText'}>Back Home</CustomText>
+                    </Pressable>
+                </CustomViews>
+            </CustomViews>
+        </CustomViews>
     )
 }
+
+const Styles = StyleSheet.create({
+    button: {
+        paddingHorizontal: '10%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#0004FF',
+        minHeight: 40,
+        borderStyle: 'solid',
+        borderColor: '#000000',
+        borderWidth: 1,
+    },
+    textInput: {
+        borderWidth: 1,
+        borderColor: '#000000',
+        width: 300,
+        justifyContent: 'center',
+    },
+});

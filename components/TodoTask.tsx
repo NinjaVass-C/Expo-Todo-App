@@ -18,20 +18,24 @@ export function TodoTask({description, isCompleted, dueDate, createdDate, onTogg
     return (
         <View style={Styles.mainContainer}>
             <View style={Styles.textContainer}>
-                <Text>{description}</Text>
+                <CustomText type={'subtitle'}>{description}</CustomText>
                 <Text>Created At: {convertedCreatedDate.toDateString()}</Text>
                 <Text>Due Date: {convertedDueDate.toDateString()}</Text>
             </View>
             <View style={Styles.buttonContainer}>
                 <Pressable
-                    style={Styles.button}
+                    style={[Styles.button, { backgroundColor: '#cd0101' }]}
                     onPress={onDelete}>
-                    <CustomText type={'buttonText'}>Delete</CustomText>
+                    <CustomText type={'buttonText'}>
+                        Delete
+                    </CustomText>
                 </Pressable>
                 <Pressable
                     style={Styles.button}
                     onPress={onEdit}>
-                    <Text>Edit</Text>
+                    <CustomText type={'buttonText'}>
+                        Edit
+                    </CustomText>
                 </Pressable>
                 <Checkbox
                     value={isCompleted}
@@ -59,7 +63,7 @@ const Styles = StyleSheet.create({
     button: {
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#00fff7',
+        backgroundColor: '#00d595',
         borderStyle: 'solid',
         borderColor: '#000000',
         borderWidth: 1,

@@ -32,8 +32,24 @@ export default function Index() {
                                   createdDate={item.created_at}
                                   dueDate={item.due_date}
                                   isCompleted={item.is_completed}
-                                  onDelete={() => router.push('/DeleteTodoPage')}
-                                  onEdit={() => router.push('/UpdateTodoPage')}
+                                  onDelete={() => router.push({
+                                          pathname: '/DeleteTodoPage',
+                                          params: {
+                                              id: item.id,
+                                              description: item.description
+                                          }
+                                      }
+                                  )}
+                                  onEdit={() => router.push({
+                                          pathname: '/UpdateTodoPage',
+                                          params: {
+                                              id: item.id,
+                                              initialDescription: item.description,
+                                              initialDueDate: item.due_date,
+                                              initialCompleted: item.is_completed.toString()
+                                          }
+                                      }
+                                  )}
                                   onToggleComplete={() => {
                                       item.is_completed = !item.is_completed;
                                       updateTodo(item.id, item.description, item.due_date, item.is_completed);
