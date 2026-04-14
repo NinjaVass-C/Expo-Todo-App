@@ -27,7 +27,7 @@ export default function DeleteTodoPage() {
     // Helper function to delete todo and go back to home in one go
     function validateDeletion() {
         deleteTodo(Number(id));
-        router.push('/');
+        router.back()
     }
 
 
@@ -54,7 +54,7 @@ export default function DeleteTodoPage() {
                     <Pressable
                         style={Styles.button}
                         onPress={() => {
-                            router.push('/')
+                            router.back()
                         }}
                     >
                         <CustomText type={'buttonText'}>Back Home</CustomText>

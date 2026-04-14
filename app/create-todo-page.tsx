@@ -1,44 +1,39 @@
-import {Pressable, StyleSheet, TextInput} from 'react-native'
+import {Pressable, StyleSheet, Text, TextInput} from 'react-native'
 import {CustomViews} from "@/components/CustomViews";
 import {CustomText} from "@/components/CustomText";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import {router, useLocalSearchParams} from "expo-router";
-import {useState} from "react";
-import {useTodos} from "@/hooks/useTodos";
-import {Checkbox} from "expo-checkbox";
+import {useEffect, useState} from "react";
+import DateTimePicker from '@react-native-community/datetimepicker'
+import {router} from "expo-router";
+import {useTodos} from '@/hooks/useTodos'
 
 /**
- * Page used for updating todos, when clicking on the update
- * button for a todo, sends the id, description, due date, and completed status,
- * allowing the user to modify all aspects of the todo. The user can then press 'update todo'
- * to update the record in the db, then return back to home. Return to home button is also present to cancel.
+ * Page used for creating todos, allows user to enter
+ * a description and due date, then a 'create todo' button
+ * to submit the todo. Also has a button to go back home
  *
  *
  */
 
 
-export default function UpdateTodoPage() {
-    const {id, initialDescription, initialDueDate, initialCompleted} = useLocalSearchParams<{
-        id: string;
-        initialDescription: string;
-        initialDueDate: string;
-        initialCompleted: string;
-    }>();
-
-    const [description, setDescription] = useState<string>(initialDescription);
-    const [dueDate, setDueDate] = useState<Date>(new Date(Number(initialDueDate)));
-    const [completed, setCompleted] = useState<boolean>(initialCompleted === 'true');
+export default function CreateTodoPage() {
+    const [description, setDescription] = useState<string>('');
+    const [dueDate, setDueDate] = useState<Date>(new Date());
     const [showDateSelector, setShowDateSelector] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
-    const {updateTodo} = useTodos();
+    const {createTodo} = useTodos();
 
+    /**
+     * Validate the todo before submitting it,
+     * since due date is default set to the current time
+     * only the description needs to be validated.
+     */
     function validateTodo() {
         setError('');
         if (description !== '') {
             setDescription(description);
             console.log(dueDate);
-            updateTodo(Number(id), description, Number(dueDate), completed);
-            router.push('/')
+            createTodo(description, Number(dueDate));
+            router.back()
         } else {
             setError('Please enter a description for the todo.')
         }
@@ -48,7 +43,7 @@ export default function UpdateTodoPage() {
         <CustomViews type={'default'}>
             <CustomViews type={'title'}>
                 <CustomText type={'title'}>
-                    Editing Todo
+                    Creating Todo
                 </CustomText>
             </CustomViews>
             <CustomViews type={'content'}>
@@ -59,7 +54,7 @@ export default function UpdateTodoPage() {
                     <TextInput
                         style={Styles.textInput}
                         onChangeText={input => setDescription(input)}
-                        placeholder={description}
+                        placeholder={'Enter Description'}
                     />
                 </CustomViews>
                 <CustomViews type={'inputs'}>
@@ -75,6 +70,8 @@ export default function UpdateTodoPage() {
                             value={dueDate}
                             mode={'date'}
                             onChange={(value) => {
+                                // In order to work with the useState, need to get the
+                                // timestamp of the DateTimePicker
                                 setDueDate(new Date(value.nativeEvent.timestamp));
                                 setShowDateSelector(false)
                             }}
@@ -84,16 +81,6 @@ export default function UpdateTodoPage() {
                     <CustomText type={'subtitle'}>
                         The current date selected is {dueDate.toDateString()}
                     </CustomText>
-                    <CustomText type={'subtitle'}>
-                        Toggle Task Completion Status
-                    </CustomText>
-                    <Checkbox
-                        value={completed}
-                        onValueChange={(completed) => {
-                            console.log(completed);
-                            setCompleted(completed)
-                        }}
-                    />
                 </CustomViews>
                 <CustomViews type={'error'}>
                     <CustomText type={'error'}>
@@ -108,12 +95,12 @@ export default function UpdateTodoPage() {
                         style={Styles.button}
                         onPress={() => validateTodo()}
                     >
-                        <CustomText type={'buttonText'}>Update Todo</CustomText>
+                        <CustomText type={'buttonText'}>Create Todo</CustomText>
                     </Pressable>
                     <Pressable
                         style={Styles.button}
                         onPress={() => {
-                            router.push('/')
+                            router.back()
                         }}
                     >
                         <CustomText type={'buttonText'}>Back Home</CustomText>
