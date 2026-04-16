@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import {apiFetch} from "@/services/api";
 
 export type Todo = {
@@ -10,8 +10,8 @@ export type Todo = {
     created_at: number;
 }
 /**
- * Custom react hook for performing todoRepository actions
- * throughout the application.
+ * Custom react hook that performs crud operations from
+ * the external api for todo tasks.
  */
 
 
@@ -20,22 +20,20 @@ export function useTodos() {
     const [error, setError] = useState('');
 
 
-    const fetchTodos = async (includeCompleted: boolean = false) => {
-        console.log(includeCompleted);
+    const fetchTodos = useCallback(async (includeCompleted: boolean = false) => {
         setError('');
         try {
             const res = await apiFetch(`/tasks?include_completed=${includeCompleted}`);
-            const data = await res.json()
+            const data = await res.json();
             setTodos(data.data);
         } catch (error) {
             setError('There was an error fetching todos.');
         }
-    }
+    }, []);
 
     const deleteTodo = async (id: number) => {
         setError('');
         try {
-            console.log("Test")
             const res = await apiFetch(`/task/${id}`, {
                 method: 'DELETE',
             });
@@ -76,7 +74,6 @@ export function useTodos() {
     }
 
     const createTodo = async(description: string, dueDate: number) => {
-        console.log(dueDate);
         setError('');
         try {
             const res = await apiFetch(`/task`, {
@@ -86,7 +83,6 @@ export function useTodos() {
                     due_date: dueDate,
                 })
             })
-            console.log(res)
         } catch (error) {
             console.log(error);
             setError('There was an error creating todo');

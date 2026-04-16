@@ -13,9 +13,6 @@ import {useTodos} from "@/hooks/useTodos";
  * return back to the home page
  */
 
-
-
-
 export default function DeleteTodoPage() {
     // get params sent by the index router call
     const { id, description } = useLocalSearchParams<{

@@ -1,9 +1,15 @@
 import * as SecureStore from "expo-secure-store"
 import {router} from "expo-router";
-import {getItemAsync} from "expo-secure-store";
 import {apiFetch} from "@/services/api";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+/**
+ * Various authentication functions used for
+ * tracking user state, logins, etc.
+ * Doesn't use apiFetch to prevent login redirects.
+ */
+
 
 export async function login(username: string, password: string) {
     const res = await fetch(`${API_URL}/auth/login`, {

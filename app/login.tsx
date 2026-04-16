@@ -5,10 +5,10 @@ import {router} from "expo-router";
 import {useState} from "react";
 import {login} from "@/services/auth";
 
-
+/**
+ * Login page that uses auth in api to let user see their tasks
+ */
 export default function LoginPage() {
-
-
     async function processLogin() {
         try {
             await login(username, password)
@@ -56,11 +56,6 @@ export default function LoginPage() {
                     </CustomText>
                 </CustomViews>
             </CustomViews>
-
-
-
-
-
             <CustomViews type={'footer'}>
                 <CustomViews type={'buttons'}>
                     <Pressable
@@ -78,10 +73,6 @@ export default function LoginPage() {
                 </CustomViews>
             </CustomViews>
         </CustomViews>
-
-
-
-
 )
 }
 const Styles = StyleSheet.create({

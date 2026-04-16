@@ -26,11 +26,11 @@ export default function CreateTodoPage() {
      * since due date is default set to the current time
      * only the description needs to be validated.
      */
-    function validateTodo() {
+    async function validateTodo() {
         setError('');
         if (description !== '') {
             setDescription(description);
-            createTodo(description, dueDate.getTime());
+            await createTodo(description, dueDate.getTime());
             router.back()
         } else {
             setError('Please enter a description for the todo.')

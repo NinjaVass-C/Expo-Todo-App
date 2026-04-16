@@ -2,11 +2,15 @@ import {StyleSheet, Pressable, FlatList} from "react-native";
 import {CustomViews} from "@/components/CustomViews";
 import {CustomText} from "@/components/CustomText";
 import {Checkbox} from 'expo-checkbox'
-import {useEffect, useState} from "react";
-import {router} from "expo-router";
+import {useCallback, useState} from "react";
+import * as SecureStore from "expo-secure-store"
+import {router, useFocusEffect} from "expo-router";
 import {useTodos} from '@/hooks/useTodos'
 import {TodoTask} from "@/components/TodoTask";
 import {logout} from "@/services/auth";
+import {Image} from "expo-image";
+// @ts-ignore idk why but this throws a linting error
+import logoutIcon from "../assets/images/logout.png";
 
 /**
  * Home page for user to perform crud operations
@@ -20,25 +24,29 @@ import {logout} from "@/services/auth";
 export default function Home() {
     const [includeCompleted, setIncludeCompleted] = useState(false);
     const {todos, fetchTodos, updateTodo, deleteAllTodos} = useTodos();
-
+    const username = SecureStore.getItem("username");
     // useEffect for updating todos list when filtering by not completed/all
-    useEffect(() => {
-        fetchTodos(includeCompleted);
-    }, [fetchTodos, includeCompleted]);
-
-    async function handleLogout() {
-        try {
-            await logout()
-        } catch (error: any) {
-            console.error(error);
-        }
-    }
+    useFocusEffect(
+        useCallback(() => {
+            fetchTodos(includeCompleted);
+        }, [fetchTodos, includeCompleted])
+    );
 
     return (
         <CustomViews type={'default'}>
+            <Pressable onPress={() => logout()}
+                        style={Styles.logoutButton}>
+                <Image
+                    source={logoutIcon}
+                    style={Styles.icon}
+                />
+            </Pressable>
             <CustomViews type={'title'}>
                 <CustomText type={'title'}>
                     What ToDo
+                </CustomText>
+                <CustomText type={'subtitle'}>
+                    Logged in as: {username}
                 </CustomText>
             </CustomViews>
             <CustomViews type={'scrollContainer'}>
@@ -73,8 +81,7 @@ export default function Home() {
                                       }
                                   )}
                                   onToggleComplete={() => {
-                                      item.is_completed = !item.is_completed;
-                                      updateTodo(item.id, item.description, item.due_date, item.is_completed);
+                                      updateTodo(item.id, item.description, item.due_date, !item.is_completed);
                                       // when marking a task as complete, fetch the todos again to update,
                                       // I did this instead of updating the checkbox state directly since I wanted
                                       // to keep the db as the source of truth.
@@ -112,12 +119,6 @@ export default function Home() {
                     >
                         <CustomText type={'buttonText'}>Clear All</CustomText>
                     </Pressable>
-                    <Pressable
-                        style={Styles.button}
-                        onPress={() => handleLogout()}
-                    >
-                        <CustomText type={'buttonText'}>Log out</CustomText>
-                    </Pressable>
                 </CustomViews>
             </CustomViews>
         </CustomViews>
@@ -139,5 +140,15 @@ const Styles = StyleSheet.create({
         flexGrow: 1,
         alignItems: 'center',
         padding: 10
+    },
+    icon: {
+        width: 30,
+        height: 30,
+    },
+    logoutButton: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        zIndex: 10
     }
 })

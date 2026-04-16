@@ -5,6 +5,10 @@ import {Pressable, StyleSheet, TextInput} from "react-native";
 import {router} from "expo-router";
 import {register} from "@/services/auth";
 
+/**
+ * Signup page that allows user to create a new account to manage their todos.
+ *
+ */
 export default function SignUpPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
