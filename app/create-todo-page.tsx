@@ -21,7 +21,6 @@ export default function CreateTodoPage() {
     const [showDateSelector, setShowDateSelector] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const {createTodo} = useTodos();
-
     /**
      * Validate the todo before submitting it,
      * since due date is default set to the current time
@@ -31,8 +30,7 @@ export default function CreateTodoPage() {
         setError('');
         if (description !== '') {
             setDescription(description);
-            console.log(dueDate);
-            createTodo(description, Number(dueDate));
+            createTodo(description, dueDate.getTime());
             router.back()
         } else {
             setError('Please enter a description for the todo.')
@@ -69,11 +67,11 @@ export default function CreateTodoPage() {
                     {showDateSelector && (<DateTimePicker
                             value={dueDate}
                             mode={'date'}
-                            onChange={(value) => {
-                                // In order to work with the useState, need to get the
-                                // timestamp of the DateTimePicker
-                                setDueDate(new Date(value.nativeEvent.timestamp));
+                            onChange={(event, selectedDate) => {
                                 setShowDateSelector(false)
+                                if (selectedDate) {
+                                    setDueDate(selectedDate)
+                                }
                             }}
                         />
                     )

@@ -22,13 +22,13 @@ export default function SignUpPage() {
         <CustomViews type={'default'}>
             <CustomViews type={'title'}>
                 <CustomText type={'title'}>
-                    Login
+                    Create New Account
                 </CustomText>
             </CustomViews>
             <CustomViews type={'content'}>
                 <CustomViews type={'inputs'}>
                     <CustomText type={'subtitle'}>
-                        Please enter your username
+                        Please enter a username
                     </CustomText>
                     <TextInput
                         style={Styles.textInput}
@@ -38,7 +38,7 @@ export default function SignUpPage() {
                 </CustomViews>
                 <CustomViews type={'inputs'}>
                     <CustomText type={'subtitle'}>
-                        Please enter your password
+                        Please enter a password
                     </CustomText>
                     <TextInput
                         style={Styles.textInput}

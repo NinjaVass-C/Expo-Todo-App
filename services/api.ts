@@ -1,11 +1,10 @@
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
     const token = await SecureStore.getItemAsync("token");
-
     const res = await fetch(`${API_URL}${path}`, {
         ...options,
         headers: {

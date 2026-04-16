@@ -9,7 +9,7 @@ import {TodoTask} from "@/components/TodoTask";
 import {logout} from "@/services/auth";
 
 /**
- * Index page for user to perform crud operations
+ * Home page for user to perform crud operations
  * on their todos. All todos already created are listed in a
  * scroll view, with the user being able to toggle by not completed/all tasks.
  * The user can also clear all todo tasks at once with the 'clear all' button.
@@ -106,7 +106,8 @@ export default function Home() {
                     <Pressable
                         style={Styles.button}
                         onPress={() => {
-                            deleteAllTodos();
+                            // todo make the api handle this correctly.
+                            // deleteAllTodos();
                             fetchTodos(includeCompleted);
                         }}
                     >

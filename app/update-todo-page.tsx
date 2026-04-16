@@ -26,7 +26,7 @@ export default function UpdateTodoPage() {
     }>();
 
     const [description, setDescription] = useState<string>(initialDescription);
-    const [dueDate, setDueDate] = useState<Date>(new Date(Number(initialDueDate)));
+    const [dueDate, setDueDate] = useState<Date>(new Date(initialDueDate));
     const [completed, setCompleted] = useState<boolean>(initialCompleted === 'true');
     const [showDateSelector, setShowDateSelector] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
@@ -36,8 +36,7 @@ export default function UpdateTodoPage() {
         setError('');
         if (description !== '') {
             setDescription(description);
-            console.log(dueDate);
-            updateTodo(Number(id), description, Number(dueDate), completed);
+            updateTodo(Number(id), description, dueDate.getTime(), completed);
             router.back()
         } else {
             setError('Please enter a description for the todo.')
@@ -74,9 +73,11 @@ export default function UpdateTodoPage() {
                     {showDateSelector && (<DateTimePicker
                             value={dueDate}
                             mode={'date'}
-                            onChange={(value) => {
-                                setDueDate(new Date(value.nativeEvent.timestamp));
+                            onChange={(event, selectedDate) => {
                                 setShowDateSelector(false)
+                                if (selectedDate) {
+                                    setDueDate(selectedDate)
+                                }
                             }}
                         />
                     )
@@ -90,7 +91,6 @@ export default function UpdateTodoPage() {
                     <Checkbox
                         value={completed}
                         onValueChange={(completed) => {
-                            console.log(completed);
                             setCompleted(completed)
                         }}
                     />

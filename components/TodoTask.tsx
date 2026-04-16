@@ -26,6 +26,7 @@ type TodoTaskProps = {
 
 export function TodoTask({description, isCompleted, dueDate, createdDate, onToggleComplete, onDelete, onEdit}: TodoTaskProps) {
     // convert the date timestamp to a date, allowing it to be converted to a readable format
+    // must do 1000 since db stores in seconds vs TypeScript ms
     const convertedCreatedDate = new Date(createdDate).toDateString();
     const convertedDueDate = new Date(dueDate).toDateString();
     return (
