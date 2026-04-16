@@ -32,11 +32,11 @@ export default function UpdateTodoPage() {
     const [error, setError] = useState<string>('');
     const {updateTodo} = useTodos();
 
-    function validateTodo() {
+    const validateTodo = async () => {
         setError('');
         if (description !== '') {
             setDescription(description);
-            updateTodo(Number(id), description, dueDate.getTime(), completed);
+            await updateTodo(Number(id), description, dueDate.getTime(), completed);
             router.back()
         } else {
             setError('Please enter a description for the todo.')

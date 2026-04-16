@@ -19,12 +19,15 @@ import logoutIcon from "../assets/images/logout.png";
  * The user can also clear all todo tasks at once with the 'clear all' button.
  */
 
+function processCheck() {
 
+}
 
 export default function Home() {
     const [includeCompleted, setIncludeCompleted] = useState(false);
     const {todos, fetchTodos, updateTodo, deleteAllTodos} = useTodos();
     const username = SecureStore.getItem("username");
+
     // useEffect for updating todos list when filtering by not completed/all
     useFocusEffect(
         useCallback(() => {
@@ -76,16 +79,16 @@ export default function Home() {
                                               id: item.id,
                                               initialDescription: item.description,
                                               initialDueDate: item.due_date,
-                                              initialCompleted: item.is_completed.toString()
+                                              initialCompleted: (item.is_completed === true ? "true": "false")
                                           }
                                       }
                                   )}
-                                  onToggleComplete={() => {
-                                      updateTodo(item.id, item.description, item.due_date, !item.is_completed);
+                                  onToggleComplete={async () => {
+                                      await updateTodo(item.id, item.description, item.due_date, !item.is_completed);
                                       // when marking a task as complete, fetch the todos again to update,
                                       // I did this instead of updating the checkbox state directly since I wanted
                                       // to keep the db as the source of truth.
-                                      fetchTodos(includeCompleted);
+                                      await fetchTodos(includeCompleted);
                                   }}
                         />
                     )}

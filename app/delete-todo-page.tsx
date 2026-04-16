@@ -22,8 +22,8 @@ export default function DeleteTodoPage() {
     const {deleteTodo} = useTodos();
 
     // Helper function to delete todo and go back to home in one go
-    function validateDeletion() {
-        deleteTodo(Number(id));
+    const validateDeletion = async () => {
+        await deleteTodo(Number(id));
         router.back()
     }
 

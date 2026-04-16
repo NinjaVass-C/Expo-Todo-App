@@ -1,5 +1,6 @@
 import {useCallback, useState} from "react";
 import {apiFetch} from "@/services/api";
+import {getCache, setCache, wipeCache} from "@/services/cache";
 
 export type Todo = {
     id: number;
@@ -14,7 +15,7 @@ export type Todo = {
  * the external api for todo tasks.
  */
 
-
+const CACHE_KEY = "todos";
 export function useTodos() {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [error, setError] = useState('');
@@ -22,10 +23,29 @@ export function useTodos() {
 
     const fetchTodos = useCallback(async (includeCompleted: boolean = false) => {
         setError('');
+        console.log("FETCHING TODOS")
+        const cached: Todo[] = await getCache(CACHE_KEY);
+        if (cached) {
+            let filtered: Todo[] = cached
+            console.log(cached)
+            if (!includeCompleted) {
+                filtered = cached.filter(t => !t.is_completed)
+            }
+            setTodos(filtered)
+            return
+        }
         try {
-            const res = await apiFetch(`/tasks?include_completed=${includeCompleted}`);
+            const res = await apiFetch(`/tasks`);
             const data = await res.json();
-            setTodos(data.data);
+            let all: Todo[] = data.data
+            let filtered
+            if (!includeCompleted) {
+                filtered = all.filter(t=> !t.is_completed)
+                setTodos(filtered);
+            } else {
+                setTodos(data.data)
+            }
+            await setCache(CACHE_KEY, data.data)
         } catch (error) {
             setError('There was an error fetching todos.');
         }
@@ -34,10 +54,15 @@ export function useTodos() {
     const deleteTodo = async (id: number) => {
         setError('');
         try {
-            const res = await apiFetch(`/task/${id}`, {
+            await apiFetch(`/task/${id}`, {
                 method: 'DELETE',
             });
-            const data = await res.json()
+            const cache: Todo[] = await getCache(CACHE_KEY);
+            if (cache) {
+                const updated = cache.filter(t => t.id !== id);
+                await setCache(CACHE_KEY, updated);
+                setTodos(updated);
+            }
         } catch (error) {
             setError('There was an error deleting the todo of id: ' + id);
         }
@@ -49,6 +74,7 @@ export function useTodos() {
             const res = await apiFetch(`/tasks`, {
                 method: 'DELETE',
             });
+            await wipeCache()
         } catch (error) {
             console.log(error);
             setError('Error Deleting All Todos');
@@ -67,6 +93,14 @@ export function useTodos() {
                     is_completed: isCompleted,
                 })
             })
+            const data = await res.json();
+            const updatedTodo = data.data[0]
+            const cached: Todo[] = await getCache(CACHE_KEY);
+            if (cached) {
+                const updated = cached.map(t => t.id === updatedTodo.id ? updatedTodo : t);
+                await setCache(CACHE_KEY, updated);
+                setTodos(updated);
+            }
         } catch (error) {
             console.log(error);
             setError('There was an error updating the todo of id: ' + id);
@@ -83,19 +117,17 @@ export function useTodos() {
                     due_date: dueDate,
                 })
             })
+            const data = await res.json();
+            const createdTodo = data.data[0]
+            const cached = await getCache(CACHE_KEY);
+            if (cached) {
+                await setCache("todos", [createdTodo, ...cached]);
+            }
         } catch (error) {
             console.log(error);
             setError('There was an error creating todo');
         }
     }
-    // debug function, does nothing in this case as app relies on external api.
-    // const dropTable = async() =>  {
-    //     try {
-    //         await dropTables()
-    //     } catch (error) {
-    //         console.log(error + ' dropping error')
-    //     }
-    // }
 
     return {
         todos,
