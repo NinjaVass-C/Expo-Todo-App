@@ -21,9 +21,10 @@ export function useTodos() {
 
 
     const fetchTodos = async (includeCompleted: boolean = false) => {
+        console.log(includeCompleted);
         setError('');
         try {
-            const res = await apiFetch(`/tasks?includeCompleted=${includeCompleted}`);
+            const res = await apiFetch(`/tasks?include_completed=${includeCompleted}`);
             const data = await res.json()
             setTodos(data.data);
         } catch (error) {
@@ -34,7 +35,8 @@ export function useTodos() {
     const deleteTodo = async (id: number) => {
         setError('');
         try {
-            const res = await apiFetch(`/tasks/${id}`, {
+            console.log("Test")
+            const res = await apiFetch(`/task/${id}`, {
                 method: 'DELETE',
             });
             const data = await res.json()
@@ -49,7 +51,6 @@ export function useTodos() {
             const res = await apiFetch(`/tasks`, {
                 method: 'DELETE',
             });
-            const data = await res.json()
         } catch (error) {
             console.log(error);
             setError('Error Deleting All Todos');

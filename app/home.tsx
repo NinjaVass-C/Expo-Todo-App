@@ -106,8 +106,7 @@ export default function Home() {
                     <Pressable
                         style={Styles.button}
                         onPress={() => {
-                            // todo make the api handle this correctly.
-                            // deleteAllTodos();
+                            deleteAllTodos();
                             fetchTodos(includeCompleted);
                         }}
                     >
