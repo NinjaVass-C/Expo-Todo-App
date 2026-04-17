@@ -13,9 +13,6 @@ import {useTodos} from "@/hooks/useTodos";
  * return back to the home page
  */
 
-
-
-
 export default function DeleteTodoPage() {
     // get params sent by the index router call
     const { id, description } = useLocalSearchParams<{
@@ -25,9 +22,9 @@ export default function DeleteTodoPage() {
     const {deleteTodo} = useTodos();
 
     // Helper function to delete todo and go back to home in one go
-    function validateDeletion() {
-        deleteTodo(Number(id));
-        router.push('/');
+    const validateDeletion = async () => {
+        await deleteTodo(Number(id));
+        router.back()
     }
 
 
@@ -54,7 +51,7 @@ export default function DeleteTodoPage() {
                     <Pressable
                         style={Styles.button}
                         onPress={() => {
-                            router.push('/')
+                            router.back()
                         }}
                     >
                         <CustomText type={'buttonText'}>Back Home</CustomText>

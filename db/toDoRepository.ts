@@ -1,6 +1,9 @@
 import {getDb} from './database';
 
 /**
+ * NOTE: This repository is deprecated, all db functions are done through
+ * The external api now.
+ *
  * Todo repository used for performing Crud actions on the database.
  * Has the ability to create todos, delete a specific / all todos, update todos,
  * and fetch all todos.
@@ -8,6 +11,9 @@ import {getDb} from './database';
 
 // As mentioned in the documentation, two types were used to prevent errors with boolean
 // values and type casting for rendering completed checkboxes.
+/**
+ * @deprecated
+ */
 export type Todo = {
     id: number;
     description: string;
@@ -15,7 +21,9 @@ export type Todo = {
     due_date: number;
     created_at: number;
 }
-
+/**
+ * @deprecated
+ */
 export type dbTodo = {
     id: number;
     description: string;
@@ -24,6 +32,11 @@ export type dbTodo = {
     created_at: number;
 }
 
+/**
+ * @deprecated Handled in api
+ * @param description
+ * @param dueDate
+ */
 export async function createNewTodo(description: string, dueDate: number) {
     const db = await getDb();
     const createdDate = Number(new Date())
@@ -37,6 +50,13 @@ export async function createNewTodo(description: string, dueDate: number) {
     return result.lastInsertRowId
 }
 
+/**
+ * @deprecated Handled in api
+ * @param id
+ * @param description
+ * @param dueDate
+ * @param isCompleted
+ */
 export async function updateTodoByID(id: number, description: string, dueDate: number, isCompleted: boolean ) {
     const db = await getDb();
     const result = await db.runAsync(`
@@ -48,6 +68,10 @@ export async function updateTodoByID(id: number, description: string, dueDate: n
     );
 }
 
+/**
+ * @deprecated handled in api
+ * @param id
+ */
 export async function deleteTodoByID(id: number) {
     const db = await getDb();
     const result = await db.runAsync(`
@@ -56,6 +80,10 @@ export async function deleteTodoByID(id: number) {
     );
 }
 
+/**
+ * @deprecated
+ * @param include_completed
+ */
 export async function getAllTodos(include_completed: boolean): Promise<Todo[]> {
     console.log(' inside function')
     const db = await getDb();
@@ -71,13 +99,19 @@ export async function getAllTodos(include_completed: boolean): Promise<Todo[]> {
     }));
 }
 
+/**
+ * @deprecated
+ */
 export async function deleteTodos() {
     const db = await getDb();
     return await db.runAsync(`
     DELETE FROM todos
     `);
 }
-// Debug function for deleting db
+
+/**
+ * @deprecated
+ */
 export async function dropTables() {
     const db = await getDb();
     return await db.getAllAsync(`
