@@ -19,21 +19,21 @@ const CACHE_KEY = "todos";
 export function useTodos() {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
 
     const fetchTodos = useCallback(async (includeCompleted: boolean = false) => {
         setError('');
-        console.log("FETCHING TODOS")
         const cached: Todo[] = await getCache(CACHE_KEY);
         if (cached) {
             let filtered: Todo[] = cached
-            console.log(cached)
             if (!includeCompleted) {
                 filtered = cached.filter(t => !t.is_completed)
             }
             setTodos(filtered)
             return
         }
+        setLoading(true)
         try {
             const res = await apiFetch(`/tasks`);
             const data = await res.json();
@@ -47,13 +47,17 @@ export function useTodos() {
             }
             await setCache(CACHE_KEY, data.data)
         } catch (error) {
+            setLoading(false);
             setError('There was an error fetching todos.');
+        } finally {
+            setLoading(false);
         }
     }, []);
 
     const deleteTodo = async (id: number) => {
         setError('');
         try {
+            setLoading(true);
             await apiFetch(`/task/${id}`, {
                 method: 'DELETE',
             });
@@ -64,20 +68,25 @@ export function useTodos() {
                 setTodos(updated);
             }
         } catch (error) {
+            setLoading(false);
             setError('There was an error deleting the todo of id: ' + id);
+        } finally {
+            setLoading(false);
         }
     }
 
     const deleteAllTodos = async () => {
         setError('');
         try {
-            const res = await apiFetch(`/tasks`, {
+            await apiFetch(`/tasks`, {
                 method: 'DELETE',
             });
             await wipeCache()
         } catch (error) {
             console.log(error);
             setError('Error Deleting All Todos');
+        } finally {
+            setLoading(false);
         }
 
     }
@@ -85,6 +94,7 @@ export function useTodos() {
     const updateTodo = async (id: number, description: string, dueDate: number, isCompleted: boolean) => {
         setError('');
         try {
+            setLoading(true);
             const res = await apiFetch(`/task/${id}`, {
                 method: 'PATCH',
                 body: JSON.stringify({
@@ -102,14 +112,18 @@ export function useTodos() {
                 setTodos(updated);
             }
         } catch (error) {
+            setLoading(false);
             console.log(error);
             setError('There was an error updating the todo of id: ' + id);
+        } finally {
+            setLoading(false);
         }
     }
 
     const createTodo = async(description: string, dueDate: number) => {
         setError('');
         try {
+            setLoading(true);
             const res = await apiFetch(`/task`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -124,14 +138,18 @@ export function useTodos() {
                 await setCache("todos", [createdTodo, ...cached]);
             }
         } catch (error) {
+            setLoading(false);
             console.log(error);
             setError('There was an error creating todo');
+        } finally {
+            setLoading(false);
         }
     }
 
     return {
         todos,
         error,
+        loading,
         createTodo,
         deleteTodo,
         updateTodo,

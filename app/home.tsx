@@ -25,7 +25,7 @@ function processCheck() {
 
 export default function Home() {
     const [includeCompleted, setIncludeCompleted] = useState(false);
-    const {todos, fetchTodos, updateTodo, deleteAllTodos} = useTodos();
+    const {todos, fetchTodos, updateTodo, deleteAllTodos, loading, error} = useTodos();
     const username = SecureStore.getItem("username");
 
     // useEffect for updating todos list when filtering by not completed/all
@@ -34,7 +34,6 @@ export default function Home() {
             fetchTodos(includeCompleted);
         }, [fetchTodos, includeCompleted])
     );
-
     return (
         <CustomViews type={'default'}>
             <Pressable onPress={() => logout()}
@@ -51,48 +50,58 @@ export default function Home() {
                 <CustomText type={'subtitle'}>
                     Logged in as: {username}
                 </CustomText>
+                <CustomText type={'error'}>
+                    {error}
+                </CustomText>
             </CustomViews>
             <CustomViews type={'scrollContainer'}>
                 {/* Flatlist that is used to store todos. Using the todos fetched in the useEffect,
                  Creates a TodoTask Component for each todo, allowing the user to easily delete, update, and mark
                  an individual task as complete*/}
-                <FlatList
-                    contentContainerStyle={Styles.scrollView}
-                    data={todos}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({item}) => (
-                        <TodoTask description={item.description}
-                                  createdDate={item.created_at}
-                                  dueDate={item.due_date}
-                                  isCompleted={item.is_completed}
-                                  onDelete={() => router.push({
-                                          pathname: '/delete-todo-page',
-                                          params: {
-                                              id: item.id,
-                                              description: item.description
-                                          }
-                                      }
-                                  )}
-                                  onEdit={() => router.push({
-                                          pathname: '/update-todo-page',
-                                          params: {
-                                              id: item.id,
-                                              initialDescription: item.description,
-                                              initialDueDate: item.due_date,
-                                              initialCompleted: (item.is_completed === true ? "true": "false")
-                                          }
-                                      }
-                                  )}
-                                  onToggleComplete={async () => {
-                                      await updateTodo(item.id, item.description, item.due_date, !item.is_completed);
-                                      // when marking a task as complete, fetch the todos again to update,
-                                      // I did this instead of updating the checkbox state directly since I wanted
-                                      // to keep the db as the source of truth.
-                                      await fetchTodos(includeCompleted);
-                                  }}
+
+                <CustomViews type={'scrollContainer'}>
+                    {loading ? (
+                        <CustomText type={'subtitle'}>Loading...</CustomText>
+                    ) : (
+                        <FlatList
+                            contentContainerStyle={Styles.scrollView}
+                            data={todos}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({item}) => (
+                                <TodoTask description={item.description}
+                                          createdDate={item.created_at}
+                                          dueDate={item.due_date}
+                                          isCompleted={item.is_completed}
+                                          onDelete={() => router.push({
+                                                  pathname: '/delete-todo-page',
+                                                  params: {
+                                                      id: item.id,
+                                                      description: item.description
+                                                  }
+                                              }
+                                          )}
+                                          onEdit={() => router.push({
+                                                  pathname: '/update-todo-page',
+                                                  params: {
+                                                      id: item.id,
+                                                      initialDescription: item.description,
+                                                      initialDueDate: item.due_date,
+                                                      initialCompleted: (item.is_completed === true ? "true": "false")
+                                                  }
+                                              }
+                                          )}
+                                          onToggleComplete={async () => {
+                                              await updateTodo(item.id, item.description, item.due_date, !item.is_completed);
+                                              // when marking a task as complete, fetch the todos again to update,
+                                              // I did this instead of updating the checkbox state directly since I wanted
+                                              // to keep the db as the source of truth.
+                                              await fetchTodos(includeCompleted);
+                                          }}
+                                />
+                                )}
                         />
                     )}
-                />
+                </CustomViews>
             </CustomViews>
             <CustomViews type={'footer'}>
                 <CustomViews type={'buttons'}>
