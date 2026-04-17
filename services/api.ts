@@ -13,21 +13,29 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
     const token = await SecureStore.getItemAsync("token");
-    const res = await fetch(`${API_URL}${path}`, {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            ...(options.headers || {}),
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-    });
-    // api has stated user is not logged in
-    if (res.status === 401) {
-        await SecureStore.deleteItemAsync("token");
-        // redirect to login
-        router.replace("/login");
-        throw new Error("Unauthorized");
-    }
 
-    return res;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const res = await fetch(`${API_URL}${path}`, {
+            ...options,
+            signal: controller.signal,
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {}),
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+        });
+        clearTimeout(timeout);
+        if (res.status === 401) {
+            await SecureStore.deleteItemAsync("token");
+            // redirect to login
+            router.replace("/login");
+        }
+        if (!res.ok) throw new Error("Something went wrong");
+        return res;
+    } catch (error) {
+        console.log("TEST HERE")
+        throw new Error("Request to server has timed out")
+    }
 }

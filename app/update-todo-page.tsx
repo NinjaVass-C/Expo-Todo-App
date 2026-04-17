@@ -29,18 +29,23 @@ export default function UpdateTodoPage() {
     const [dueDate, setDueDate] = useState<Date>(new Date(initialDueDate));
     const [completed, setCompleted] = useState<boolean>(initialCompleted === 'true');
     const [showDateSelector, setShowDateSelector] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
-    const {updateTodo} = useTodos();
+    const [pageError, setPageError] = useState<string>('');
+    const {updateTodo, loading, error} = useTodos();
 
     const validateTodo = async () => {
-        setError('');
-        if (description !== '') {
+        setPageError('');
+        if (description === '') {
+            setPageError('Please enter a description for the todo.')
+            return;
+        }
+        try {
             setDescription(description);
             await updateTodo(Number(id), description, dueDate.getTime(), completed);
             router.back()
-        } else {
-            setError('Please enter a description for the todo.')
+        } catch {
+            // useTodos handles this error
         }
+
     }
 
     return (
@@ -97,7 +102,10 @@ export default function UpdateTodoPage() {
                 </CustomViews>
                 <CustomViews type={'error'}>
                     <CustomText type={'error'}>
-                        {error}
+                        {pageError ? pageError: error}
+                    </CustomText>
+                    <CustomText type={'default'}>
+                        {loading ? 'Loading...' : ''}
                     </CustomText>
                 </CustomViews>
             </CustomViews>

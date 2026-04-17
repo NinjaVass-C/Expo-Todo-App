@@ -3,6 +3,7 @@ import {Pressable, StyleSheet, Text} from 'react-native'
 import {router, useLocalSearchParams} from "expo-router";
 import {CustomText} from "@/components/CustomText";
 import {useTodos} from "@/hooks/useTodos";
+import {useState} from "react";
 
 
 /**
@@ -19,12 +20,16 @@ export default function DeleteTodoPage() {
         id: string;
         description: string;
     }>();
-    const {deleteTodo} = useTodos();
-
+    const {deleteTodo, loading, error} = useTodos();
     // Helper function to delete todo and go back to home in one go
     const validateDeletion = async () => {
-        await deleteTodo(Number(id));
-        router.back()
+        try {
+            await deleteTodo(Number(id));
+            router.back()
+        } catch {
+            // useTodos handles this error
+        }
+
     }
 
 
@@ -39,6 +44,14 @@ export default function DeleteTodoPage() {
                 <CustomText type={'subtitle'}>
                     Are you sure you want to delete {description}?
                 </CustomText>
+                <CustomViews type={'error'}>
+                    <CustomText type={'error'}>
+                        {error}
+                    </CustomText>
+                    <CustomText type={'default'}>
+                        {loading ? 'Loading...' : ''}
+                    </CustomText>
+                </CustomViews>
             </CustomViews>
             <CustomViews type={'footer'}>
                 <CustomViews type={'buttons'}>

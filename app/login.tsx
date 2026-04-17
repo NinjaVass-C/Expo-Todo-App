@@ -11,8 +11,15 @@ import {login} from "@/services/auth";
 export default function LoginPage() {
     async function processLogin() {
         try {
+            if (password === "" || username === "") {
+                setError("Please enter a valid username and password")
+                return;
+            }
+            setLoading(true);
+            setError("")
             await login(username, password)
         } catch (error: any) {
+            setLoading(false);
             setError(error.message)
         }
     }
@@ -21,6 +28,7 @@ export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     return (
         <CustomViews type={'default'}>
             <CustomViews type={'title'}>
@@ -53,6 +61,9 @@ export default function LoginPage() {
                 <CustomViews type={'error'}>
                     <CustomText type={'error'}>
                         {error}
+                    </CustomText>
+                    <CustomText type={'default'}>
+                        {loading ? 'Loading...' : ''}
                     </CustomText>
                 </CustomViews>
             </CustomViews>

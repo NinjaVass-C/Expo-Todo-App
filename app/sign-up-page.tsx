@@ -13,11 +13,19 @@ export default function SignUpPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     async function handleCreation() {
         try {
+            if (password === "" || username === "") {
+                setError("Please enter a valid username and password")
+                return;
+            }
+            setError("")
+            setLoading(true);
             await register(username, password);
         } catch (error: any) {
+            setLoading(false);
             setError(error.message);
         }
     }
@@ -55,6 +63,9 @@ export default function SignUpPage() {
             <CustomViews type={'error'}>
                 <CustomText type={'error'}>
                     {error}
+                </CustomText>
+                <CustomText type={'default'}>
+                    {loading ? 'Loading...' : ''}
                 </CustomText>
             </CustomViews>
             <CustomViews type={'footer'}>

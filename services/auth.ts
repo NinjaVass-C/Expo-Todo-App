@@ -8,21 +8,30 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 /**
  * Various authentication functions used for
  * tracking user state, logins, etc.
- * Doesn't use apiFetch to prevent login redirects.
  */
 
 
 export async function login(username: string, password: string) {
-    const res = await fetch(`${API_URL}/auth/login`, {
-        headers: {"Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({ username, password }),
-    })
-    if (!res.ok) throw new Error("Invalid username or password");
-    const data = await res.json();
-    await SecureStore.setItemAsync("token", data.token);
-    await SecureStore.setItemAsync("username", data.username);
-    router.replace("/home")
+    const controller = new AbortController();
+    // shorter than apiFetch timeout, since signin should not take long
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+            headers: {"Content-Type": "application/json" },
+            signal: controller.signal,
+            method: "POST",
+            body: JSON.stringify({ username, password }),
+        })
+        clearTimeout(timeout)
+        if (!res.ok) throw new Error("Invalid username or password");
+        const data = await res.json();
+        await SecureStore.setItemAsync("token", data.token);
+        await SecureStore.setItemAsync("username", data.username);
+        router.replace("/home")
+    } catch (error: any) {
+        throw new Error("Server could not process sign in");
+    }
+
 
 }
 
@@ -33,13 +42,23 @@ export async function logout() {
 }
 
 export async function register(username: string, password: string) {
-    const res = await fetch(`${API_URL}/auth/register`, {
-        headers: {"Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({ username, password }),
-    })
-    if (!res.ok) throw new Error("Invalid username or password");
-    await login(username, password);
+    const controller = new AbortController();
+    // shorter than apiFetch timeout, since signup should not take long
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    try {
+        const res = await fetch(`${API_URL}/auth/register`, {
+            headers: {"Content-Type": "application/json" },
+            signal: controller.signal,
+            method: "POST",
+            body: JSON.stringify({ username, password }),
+        })
+        clearTimeout(timeout)
+        if (!res.ok) throw new Error("Invalid username or password");
+        await login(username, password);
+    } catch (error: any) {
+        throw new Error("Sign up could not be processed");
+    }
+
 }
 
 export async function validateToken() {

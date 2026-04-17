@@ -24,6 +24,7 @@ export function useTodos() {
 
     const fetchTodos = useCallback(async (includeCompleted: boolean = false) => {
         setError('');
+        setLoading(true)
         const cached: Todo[] = await getCache(CACHE_KEY);
         if (cached) {
             let filtered: Todo[] = cached
@@ -31,9 +32,9 @@ export function useTodos() {
                 filtered = cached.filter(t => !t.is_completed)
             }
             setTodos(filtered)
+            setLoading(false)
             return
         }
-        setLoading(true)
         try {
             const res = await apiFetch(`/tasks`);
             const data = await res.json();
@@ -47,7 +48,7 @@ export function useTodos() {
             }
             await setCache(CACHE_KEY, data.data)
         } catch (error) {
-            setLoading(false);
+            setTodos([])
             setError('There was an error fetching todos.');
         } finally {
             setLoading(false);
@@ -68,8 +69,8 @@ export function useTodos() {
                 setTodos(updated);
             }
         } catch (error) {
-            setLoading(false);
-            setError('There was an error deleting the todo of id: ' + id);
+            setError('There was an error deleting the todo');
+            throw new Error("Deletion error")
         } finally {
             setLoading(false);
         }
@@ -78,12 +79,12 @@ export function useTodos() {
     const deleteAllTodos = async () => {
         setError('');
         try {
+            setLoading(true);
             await apiFetch(`/tasks`, {
                 method: 'DELETE',
             });
             await wipeCache()
         } catch (error) {
-            console.log(error);
             setError('Error Deleting All Todos');
         } finally {
             setLoading(false);
@@ -112,9 +113,8 @@ export function useTodos() {
                 setTodos(updated);
             }
         } catch (error) {
-            setLoading(false);
-            console.log(error);
-            setError('There was an error updating the todo of id: ' + id);
+            setError('There was an error updating todo');
+            throw new Error("Update Error")
         } finally {
             setLoading(false);
         }
@@ -138,9 +138,8 @@ export function useTodos() {
                 await setCache("todos", [createdTodo, ...cached]);
             }
         } catch (error) {
-            setLoading(false);
-            console.log(error);
             setError('There was an error creating todo');
+            throw new Error("Creation error")
         } finally {
             setLoading(false);
         }

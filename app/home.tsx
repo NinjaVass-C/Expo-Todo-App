@@ -50,9 +50,11 @@ export default function Home() {
                 <CustomText type={'subtitle'}>
                     Logged in as: {username}
                 </CustomText>
-                <CustomText type={'error'}>
-                    {error}
-                </CustomText>
+                <CustomViews type={'error'}>
+                    <CustomText type={'error'}>
+                        {error}
+                    </CustomText>
+                </CustomViews>
             </CustomViews>
             <CustomViews type={'scrollContainer'}>
                 {/* Flatlist that is used to store todos. Using the todos fetched in the useEffect,
@@ -91,11 +93,15 @@ export default function Home() {
                                               }
                                           )}
                                           onToggleComplete={async () => {
-                                              await updateTodo(item.id, item.description, item.due_date, !item.is_completed);
-                                              // when marking a task as complete, fetch the todos again to update,
-                                              // I did this instead of updating the checkbox state directly since I wanted
-                                              // to keep the db as the source of truth.
-                                              await fetchTodos(includeCompleted);
+                                              try {
+                                                  await updateTodo(item.id, item.description, item.due_date, !item.is_completed);
+                                                  // when marking a task as complete, fetch the todos again to update,
+                                                  // I did this instead of updating the checkbox state directly since I wanted
+                                                  // to keep the db as the source of truth.
+                                                  await fetchTodos(includeCompleted);
+                                              } catch {
+                                                  // useTodos handles the errors
+                                              }
                                           }}
                                 />
                                 )}

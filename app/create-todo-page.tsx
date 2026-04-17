@@ -19,21 +19,25 @@ export default function CreateTodoPage() {
     const [description, setDescription] = useState<string>('');
     const [dueDate, setDueDate] = useState<Date>(new Date());
     const [showDateSelector, setShowDateSelector] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
-    const {createTodo} = useTodos();
+    const [pageError, setPageError] = useState<string>('');
+    const {createTodo, error, loading} = useTodos();
     /**
      * Validate the todo before submitting it,
      * since due date is default set to the current time
      * only the description needs to be validated.
      */
     async function validateTodo() {
-        setError('');
-        if (description !== '') {
+        setPageError('');
+        if (description === '') {
+            setPageError('Please enter a valid description')
+            return;
+        }
+        try {
             setDescription(description);
             await createTodo(description, dueDate.getTime());
             router.back()
-        } else {
-            setError('Please enter a description for the todo.')
+        } catch {
+            // useTodos handle this error
         }
     }
 
@@ -82,7 +86,10 @@ export default function CreateTodoPage() {
                 </CustomViews>
                 <CustomViews type={'error'}>
                     <CustomText type={'error'}>
-                        {error}
+                        {pageError ? pageError: error}
+                    </CustomText>
+                    <CustomText type={'default'}>
+                        {loading ? 'Loading...' : ''}
                     </CustomText>
                 </CustomViews>
             </CustomViews>
