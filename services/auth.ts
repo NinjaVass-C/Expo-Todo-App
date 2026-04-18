@@ -23,12 +23,19 @@ export async function login(username: string, password: string) {
             body: JSON.stringify({ username, password }),
         })
         clearTimeout(timeout)
-        if (!res.ok) throw new Error("Invalid username or password");
+        if (!res.ok) {
+            const error: any = new Error(res.statusText);
+            error.status = res.status;
+            throw error;
+        }
         const data = await res.json();
         await SecureStore.setItemAsync("token", data.token);
         await SecureStore.setItemAsync("username", data.username);
         router.replace("/home")
     } catch (error: any) {
+        if (error.status === 401) {
+            throw new Error("Username or password is incorrect");
+        }
         throw new Error("Server could not process sign in");
     }
 
@@ -52,13 +59,18 @@ export async function register(username: string, password: string) {
             method: "POST",
             body: JSON.stringify({ username, password }),
         })
-        clearTimeout(timeout)
-        if (!res.ok) throw new Error("Invalid username or password");
+        if (!res.ok) {
+            const error: any = new Error(res.statusText);
+            error.status = res.status;
+            throw error;
+        }
         await login(username, password);
     } catch (error: any) {
+        if (error.status === 409) {
+            throw new Error("Username is already in use");
+        }
         throw new Error("Sign up could not be processed");
     }
-
 }
 
 export async function validateToken() {
