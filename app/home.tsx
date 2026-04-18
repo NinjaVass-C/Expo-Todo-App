@@ -130,9 +130,9 @@ export default function Home() {
                     </Pressable>
                     <Pressable
                         style={Styles.button}
-                        onPress={() => {
-                            deleteAllTodos();
-                            fetchTodos(includeCompleted);
+                        onPress={async () => {
+                            await deleteAllTodos();
+                            await fetchTodos(includeCompleted);
                         }}
                     >
                         <CustomText type={'buttonText'}>Clear All</CustomText>
